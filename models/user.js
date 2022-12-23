@@ -92,12 +92,46 @@ const userSchema = mongoose.Schema({
     passwordResetExpires: Date,
 
 
-
-
 },{
     timestamps: true,
     versionKey: false
-})
+});
+
+userSchema.pre("save", function(next){
+    if(!this.isModified("password")){
+        return next()
+    }
+
+    const password = this.password;
+    const hashPassword = bcrypt.hashSync(password)
+
+    this.password = hashPassword
+    this.confirmPassword = undefined;
+
+    next()
+});
+
+
+userSchema.methods.comparePassword = function(password, hashPassword){
+    const isPasswordValid = bcrypt.compareSync(password, hashPassword)
+    return isPasswordValid;
+};
+
+
+userSchema.methods.generateConformationToken = function (){
+    const token = crypto.randomBytes(32).toString("hex")
+
+    this.conformationToken = token;
+
+    const date = new Date();
+
+    date.setDate(date.getDate() +1)
+    this.conformationTokenExpires = date;
+
+    return token;
+}
+
+
 
 const userModel = mongoose.model("user", userSchema)
 module.exports=userModel;
