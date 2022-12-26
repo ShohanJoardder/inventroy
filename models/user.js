@@ -2,7 +2,6 @@ const mongoose = require("mongoose")
 const validator = require("validator")
 const crypto = require("crypto")
 const bcrypt = require("bcryptjs")
-const { stringify } = require("querystring")
 
 
 const userSchema = mongoose.Schema({
